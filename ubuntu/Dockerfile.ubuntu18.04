@@ -30,7 +30,7 @@ RUN apt-get update -qq \
  && python3 -m pip install --upgrade pip \
  && python3 -m pip install numpy scipy pandas matplotlib epicscorelibs pvapy \
  && mkdir epics && cd epics && git clone https://github.com/thomasms/epics-base \
- && make -j16
+ && cd epics-base && make -j16
 
 WORKDIR /
 
