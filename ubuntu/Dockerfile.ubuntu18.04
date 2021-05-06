@@ -35,11 +35,9 @@ RUN apt-get update -qq \
  && apt-get -y install $(cat packages) \
  && localedef -i en_US -f UTF-8 en_US.UTF-8 \
  && rm -rf /packages /var/lib/apt/lists/* \
-# No python libs here - we should use venvs really
-# && python3 -m pip install --upgrade pip \
-# && python3 -m pip install numpy scipy pandas matplotlib epicscorelibs pvapy \
  && mkdir epics && cd epics && git clone --recursive -j4 https://github.com/thomasms/epics-base \
- && cd epics-base && make -j16 && find -maxdepth 1 -type d -not -name bin -not -name lib -not -name include -exec rm -rf {} \; rm * .*;
+ && cd epics-base && make -j16 && cd ${EPICS_BASE} \
+ && find -maxdepth 1 -type d -not -name bin -not -name lib -not -name include -exec rm -rf {} \;
 
 WORKDIR /
 

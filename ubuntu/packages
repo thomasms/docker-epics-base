@@ -4,6 +4,4 @@ gcc
 git
 lsb-release
 make
-python3
-python-dev
-python3-pip
+iproute2
