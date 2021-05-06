@@ -19,6 +19,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 ENV PYTHONDONTWRITEBYTECODE 1.
 ENV EPICS_BASE /epics/epics-base
+ENV EPICS_PVXS /epics/pvxs
 ENV LD_LIBRARY_PATH ${EPICS_BASE}/lib
 
 # Cannot get this to work in Dockerfile to persist over images
@@ -29,15 +30,20 @@ ENV PATH ${PATH}:${EPICS_BIN}
 
 COPY packages packages
 
-# Install additional packages
+# Install additional packages and install EPICS (base)
 RUN apt-get update -qq \
  && ln -sf /usr/share/zoneinfo/UTC /etc/localtime \
  && apt-get -y install $(cat packages) \
  && localedef -i en_US -f UTF-8 en_US.UTF-8 \
  && rm -rf /packages /var/lib/apt/lists/* \
  && mkdir epics && cd epics && git clone --recursive -j4 https://github.com/thomasms/epics-base \
- && cd epics-base && make -j16 && cd ${EPICS_BASE} \
- && find -maxdepth 1 -type d -not -name bin -not -name lib -not -name include -exec rm -rf {} \;
+ && cd epics-base && make -j16 
+# && cd ${EPICS_BASE} && find -maxdepth 1 -type d -not -name bin -not -name lib -not -name include -not -name configure -exec rm -rf {} \;
+
+# Additionally install PVXS
+RUN cd /epics && git clone --recursive -j4 https://github.com/thomasms/pvxs \
+ && echo "EPICS_BASE=${EPICS_BASE}" > pvxs/configure/RELEASE.local \
+ && cd /epics && make clean uninstall -C pvxs && make -j4 -C pvxs 
 
 WORKDIR /
 
